@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { getAllPets } from '../../api/pets'
 import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import {indexPetsSuccess, indexPetsFailure} from '../shared/AutoDismissAlert/messages'
 
 // I'm going to declare a style object
 // this will be used to corral my cards
@@ -15,12 +16,27 @@ const cardContainerLayout = {
 const IndexPets = (props) => {
     const [pets, setPets] = useState(null)
 
+    const {user, msgAlert} = props
+
     useEffect(() => {
         getAllPets()
             .then(res => {
                 setPets(res.data.pets)
             })
-            .catch(console.error)
+            .then(() => {
+                msgAlert({
+                    heading: 'Found some pets!',
+                    message: indexPetsSuccess,
+                    variant: 'success',
+                })
+            })
+            .catch(() => {
+                msgAlert({
+                    heading: 'No pets?!!',
+                    message: indexPetsFailure,
+                    variant: 'danger',
+                })
+            })
     }, [])
 
     if (!pets) {
